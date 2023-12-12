@@ -429,7 +429,7 @@ export function AppChat() {
       chatLLM={chatLLM}
       composerTextAreaRef={composerTextAreaRef}
       conversationId={focusedConversationId}
-      isDeveloperMode={focusedSystemPurposeId === 'Developer'}
+      isDeveloperMode={focusedSystemPurposeId === 'MyContract'}
       onAction={handleComposerAction}
       sx={{
         zIndex: 21, // position: 'sticky', bottom: 0,
