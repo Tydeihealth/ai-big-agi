@@ -143,7 +143,7 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
           <Typography level='title-sm'>
-            AI Persona
+            AI Tasks
           </Typography>
           <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
