@@ -185,13 +185,8 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
               </Button>
             </Grid>
           ))}
-<<<<<<< HEAD
-{/*           Button to start the YouTube persona creator 
-          <Grid>
-=======
           {/* Button to start the YouTube persona creator */}
           {labsPersonaYTCreator && <Grid>
->>>>>>> fbeb604b26c338ebd3af7cd5b0967d9838689f51
             <Button
               variant='soft' color='neutral'
               component={Link} noLinkStyle href='/personas'
@@ -214,11 +209,7 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
                 YouTube persona creator
               </div>
             </Button>
-<<<<<<< HEAD
-          </Grid>  */}
-=======
           </Grid>}
->>>>>>> fbeb604b26c338ebd3af7cd5b0967d9838689f51
         </Grid>
         <Typography
           level='body-sm'
