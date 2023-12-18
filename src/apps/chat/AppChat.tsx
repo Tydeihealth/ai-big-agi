@@ -183,7 +183,13 @@ export function AppChat() {
     setMessages(conversationId, history);
   }, [focusedSystemPurposeId, setMessages]);
 
-  const handleComposerAction = (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart): boolean => {
+  const handleComposerAction = (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean): boolean => {
+    
+    console.log('MaudMode ', isMaudMode);
+    if (isMaudMode = true) {
+      alert('Hello World'); // Or use another method to display the message
+      return false; // Prevent further action if it's just for display
+    } 
 
     // validate inputs
     if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
@@ -430,6 +436,7 @@ export function AppChat() {
       composerTextAreaRef={composerTextAreaRef}
       conversationId={focusedConversationId}
       isDeveloperMode={focusedSystemPurposeId === 'MyContract'}
+      isMaudMode={focusedSystemPurposeId === 'Maud'}
       onAction={handleComposerAction}
       sx={{
         zIndex: 21, // position: 'sticky', bottom: 0,

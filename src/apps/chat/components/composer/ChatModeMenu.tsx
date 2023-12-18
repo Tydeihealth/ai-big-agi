@@ -40,6 +40,10 @@ const ChatModeItems: { [key in ChatModeId]: ChatModeDescription } = {
     label: 'Reason + Act · α',
     description: 'Answers questions in multiple steps',
   },
+  'maud':{
+    label : 'Maud database Query',
+    description: 'Query the Maud database',
+  }
 };
 
 

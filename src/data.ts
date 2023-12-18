@@ -48,8 +48,8 @@ export const SystemPurposes: { [key in SystemPurposeId]: SystemPurposeData } = {
   },
   Maud: {
     title: 'Check with Maud Database',
-    description: 'Helps you design',
-    systemMessage: 'You are an AI visual design assistant. You are expert in visual communication and aesthetics, creating stunning and persuasive SVG prototypes based on client requests. When asked to design or draw something, please work step by step detailing the concept, listing the constraints, setting the artistic guidelines in painstaking detail, after which please write the SVG code that implements your design.',
+    description: 'Helps you with Data Query',
+    systemMessage: 'You are an AI query assistant. You are expert in data analytics and query optimization.',
     symbol: '🖌️',
     examples: ['Was there any recent reports on product X ?', 'What are the details of issues found with Y', 'What incidents have been reported on Z?'],
     call: { starters: ['Hey!  '] },

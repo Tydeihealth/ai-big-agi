@@ -72,7 +72,8 @@ export function Composer(props: {
   composerTextAreaRef: React.RefObject<HTMLTextAreaElement>;
   conversationId: DConversationId | null;
   isDeveloperMode: boolean;
-  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart) => boolean;
+  isMaudMode: boolean;
+  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => boolean;
   sx?: SxProps;
 }) {
 
@@ -153,7 +154,7 @@ export function Composer(props: {
       return false;
 
     // send the message
-    const enqueued = onAction(_chatModeId, conversationId, multiPartMessage);
+    const enqueued = onAction(_chatModeId, conversationId, multiPartMessage,true);
     if (enqueued) {
       clearAttachments();
       setComposeText('');
@@ -364,10 +365,14 @@ export function Composer(props: {
       : isDraw
         ? 'Describe an idea or a drawing...'
         : isReAct
-          ? 'Multi-step reasoning question...'
-          : props.isDeveloperMode
-            ? 'Chat with me · drop source files · attach code...'
-            : /*isProdiaConfigured ?*/ 'Chat · /react · /imagine · drop text files...' /*: 'Chat · /react · drop text files...'*/;
+            ? 'Multi-step reasoning question...'
+            : props.isDeveloperMode
+                  ? 'Check all the contract data...'
+  //                : /*isProdiaConfigured ?*/ 'Chat / Drop text files...' /*: 'Chat · /react · drop text files...'*/;
+                  : props.isMaudMode
+                     ? 'Check the Maud Database...'
+                     : 'Chat with me ...';
+
 
 
   return (
