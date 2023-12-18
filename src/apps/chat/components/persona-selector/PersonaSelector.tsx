@@ -3,14 +3,11 @@ import { shallow } from 'zustand/shallow';
 
 import { Box, Button, Checkbox, Grid, IconButton, Input, Stack, Textarea, Typography } from '@mui/joy';
 import ClearIcon from '@mui/icons-material/Clear';
-import ScienceIcon from '@mui/icons-material/Science';
 import SearchIcon from '@mui/icons-material/Search';
 import TelegramIcon from '@mui/icons-material/Telegram';
 
 import { DConversationId, useChatStore } from '~/common/state/store-chats';
-import { Link } from '~/common/components/Link';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
-import { useUXLabsStore } from '~/common/state/store-ux-labs';
 
 import { SystemPurposeId, SystemPurposes } from '../../../../data';
 import { usePurposeStore } from './store-purposes';
@@ -47,7 +44,6 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
 
   // external state
   const showFinder = useUIPreferencesStore(state => state.showPurposeFinder);
-  const labsPersonaYTCreator = useUXLabsStore(state => state.labsPersonaYTCreator);
   const { systemPurposeId, setSystemPurposeId } = useChatStore(state => {
     const conversation = state.conversations.find(conversation => conversation.id === props.conversationId);
     return {
@@ -143,7 +139,7 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1 }}>
           <Typography level='title-sm'>
-            AI Persona
+            AI Tasks
           </Typography>
           <Button variant='plain' color='neutral' size='sm' onClick={toggleEditMode}>
             {editMode ? 'Done' : 'Edit'}
@@ -185,31 +181,7 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
               </Button>
             </Grid>
           ))}
-          {/* Button to start the YouTube persona creator */}
-          {labsPersonaYTCreator && <Grid>
-            <Button
-              variant='soft' color='neutral'
-              component={Link} noLinkStyle href='/personas'
-              sx={{
-                '--Icon-fontSize': '2rem',
-                flexDirection: 'column',
-                fontWeight: 500,
-                // gap: bpTileGap,
-                height: bpTileSize,
-                width: bpTileSize,
-                border: `1px dashed`,
-                boxShadow: 'md',
-                backgroundColor: 'background.surface',
-              }}
-            >
-              <div>
-                <ScienceIcon />
-              </div>
-              <div>
-                YouTube persona creator
-              </div>
-            </Button>
-          </Grid>}
+
         </Grid>
         <Typography
           level='body-sm'
@@ -250,10 +222,7 @@ export function PersonaSelector(props: { conversationId: DConversationId, runExa
               mt: 1,
             }} />
         )}
-
       </Box>
-
     </Stack>
-
-  </>;
+</>
 }
