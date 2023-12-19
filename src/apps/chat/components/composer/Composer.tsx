@@ -154,7 +154,7 @@ export function Composer(props: {
       return false;
 
     // send the message
-    const enqueued = onAction(_chatModeId, conversationId, multiPartMessage,true);
+    const enqueued = onAction(_chatModeId, conversationId, multiPartMessage, props.isMaudMode);
     if (enqueued) {
       clearAttachments();
       setComposeText('');

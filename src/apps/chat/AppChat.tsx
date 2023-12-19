@@ -186,7 +186,7 @@ export function AppChat() {
   const handleComposerAction = (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean): boolean => {
     
     console.log('MaudMode ', isMaudMode);
-    if (isMaudMode = true) {
+    if (isMaudMode == true) {
       alert('Hello World'); // Or use another method to display the message
       return false; // Prevent further action if it's just for display
     } 
