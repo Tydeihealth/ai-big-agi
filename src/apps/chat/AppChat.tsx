@@ -196,16 +196,8 @@ export function AppChat() {
       console.log('User Text:', userText);
 
       try {
-        // Replace with the actual URL/endpoint of your Elasticsearch or server that handles the search
-        const response = await axios.post('/api/search', { query: userText });
-        const searchResults = response.data; // Adjust according to the response structure
-
-        console.log('Search Results:', searchResults);
-        // Handle search results (e.g., display them in some way)
-        // ...
-
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
-        const response = await axios.post('http://python-llm.ue.r.appspot/api/process', { referenceNumber: userText });
+        const response = await axios.post('http://python-llm.ue.r.appspot/I ', { referenceNumber: userText });
         console.log('API Response:', response.data);
 
       } catch (error) {
