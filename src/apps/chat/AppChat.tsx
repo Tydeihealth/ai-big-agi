@@ -36,7 +36,7 @@ import { runBrowseUpdatingState } from './editors/browse-load';
 import { runImageGenerationUpdatingState } from './editors/image-generate';
 import { runReActUpdatingState } from './editors/react-tangent';
 
-
+import axios from 'axios'; // Assuming axios for HTTP requests
 /**
  * Mode: how to treat the input from the Composer
  */
@@ -183,13 +183,31 @@ export function AppChat() {
     setMessages(conversationId, history);
   }, [focusedSystemPurposeId, setMessages]);
 
-  const handleComposerAction = (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean): boolean => {
+  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => {
     
     console.log('MaudMode ', isMaudMode);
-    if (isMaudMode == true) {
-      alert('Hello World'); // Or use another method to display the message
-      return false; // Prevent further action if it's just for display
-    } 
+    if (isMaudMode) {
+      if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
+        console.error('Invalid message format');
+        return false;
+      }
+
+      const userText = multiPartMessage[0].text;
+      console.log('User Text:', userText);
+
+      try {
+        // Replace with the actual URL/endpoint of your Elasticsearch or server that handles the search
+        const response = await axios.post('/api/search', { query: userText });
+        const searchResults = response.data; // Adjust according to the response structure
+
+        console.log('Search Results:', searchResults);
+        // Handle search results (e.g., display them in some way)
+        // ...
+
+      } catch (error) {
+        console.error('Error searching:', error);
+      }
+    }
 
     // validate inputs
     if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
@@ -204,6 +222,9 @@ export function AppChat() {
       return false;
     }
     const userText = multiPartMessage[0].text;
+    console.log('userText  from Chatbox', userText);   // this is the text from the ChatBox Input
+
+
 
     // find conversation
     const conversation = getConversation(conversationId);
@@ -213,8 +234,9 @@ export function AppChat() {
     // start execution (async)
     void _handleExecute(chatModeId, conversationId, [
       ...conversation.messages,
-      createDMessage('user', userText),
+      createDMessage('user', userText)
     ]);
+    
     return true;
   };
 
@@ -257,6 +279,7 @@ export function AppChat() {
       : prependNewConversation(focusedSystemPurposeId ?? undefined),
     );
     composerTextAreaRef.current?.focus();
+    console.log('New Text Chat created');  // this is added when starting a new chat
   }, [focusedSystemPurposeId, newConversationId, prependNewConversation, setFocusedConversationId]);
 
   const handleConversationImportDialog = () => setTradeConfig({ dir: 'import' });
@@ -437,7 +460,7 @@ export function AppChat() {
       conversationId={focusedConversationId}
       isDeveloperMode={focusedSystemPurposeId === 'MyContract'}
       isMaudMode={focusedSystemPurposeId === 'Maud'}
-      onAction={handleComposerAction}
+      onAction={handleComposerAction} 
       sx={{
         zIndex: 21, // position: 'sticky', bottom: 0,
         backgroundColor: 'background.surface',
