@@ -184,7 +184,7 @@ export function AppChat() {
   }, [focusedSystemPurposeId, setMessages]);
 
   const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => {
-    
+
     console.log('MaudMode ', isMaudMode);
     if (isMaudMode) {
       if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
@@ -194,14 +194,22 @@ export function AppChat() {
 
       const userText = multiPartMessage[0].text;
       console.log('User Text:', userText);
+      const axios = require('axios');
+
 
       try {
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
-        const response = await axios.post('http://python-llm.ue.r.appspot/api/process', { referenceNumber: userText });
+        
+        const response = await axios.post('http://python-llm.ue.r.appspot.com/api/process',
+          {"referenceNumber": userText}, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
         console.log('API Response:', response.data);
 
       } catch (error) {
-        console.error('Error searching:', error);
+        console.log('Error in API :', error);
       }
     }
 
@@ -232,7 +240,7 @@ export function AppChat() {
       ...conversation.messages,
       createDMessage('user', userText)
     ]);
-    
+
     return true;
   };
 
@@ -361,35 +369,35 @@ export function AppChat() {
   // Pluggable ApplicationBar components
 
   const centerItems = React.useMemo(() =>
-      <ChatDropdowns conversationId={focusedConversationId} />,
+    <ChatDropdowns conversationId={focusedConversationId} />,
     [focusedConversationId],
   );
 
   const drawerItems = React.useMemo(() =>
-      <ChatDrawerItemsMemo
-        activeConversationId={focusedConversationId}
-        disableNewButton={isFocusedChatEmpty}
-        onConversationActivate={setFocusedConversationId}
-        onConversationDelete={handleConversationDelete}
-        onConversationImportDialog={handleConversationImportDialog}
-        onConversationNew={handleConversationNew}
-        onConversationsDeleteAll={handleConversationsDeleteAll}
-      />,
+    <ChatDrawerItemsMemo
+      activeConversationId={focusedConversationId}
+      disableNewButton={isFocusedChatEmpty}
+      onConversationActivate={setFocusedConversationId}
+      onConversationDelete={handleConversationDelete}
+      onConversationImportDialog={handleConversationImportDialog}
+      onConversationNew={handleConversationNew}
+      onConversationsDeleteAll={handleConversationsDeleteAll}
+    />,
     [focusedConversationId, handleConversationDelete, handleConversationNew, isFocusedChatEmpty, setFocusedConversationId],
   );
 
   const menuItems = React.useMemo(() =>
-      <ChatMenuItems
-        conversationId={focusedConversationId}
-        hasConversations={!areChatsEmpty}
-        isConversationEmpty={isFocusedChatEmpty}
-        isMessageSelectionMode={isMessageSelectionMode}
-        setIsMessageSelectionMode={setIsMessageSelectionMode}
-        onConversationBranch={handleConversationBranch}
-        onConversationClear={handleConversationClear}
-        onConversationExport={handleConversationExport}
-        onConversationFlatten={handleConversationFlatten}
-      />,
+    <ChatMenuItems
+      conversationId={focusedConversationId}
+      hasConversations={!areChatsEmpty}
+      isConversationEmpty={isFocusedChatEmpty}
+      isMessageSelectionMode={isMessageSelectionMode}
+      setIsMessageSelectionMode={setIsMessageSelectionMode}
+      onConversationBranch={handleConversationBranch}
+      onConversationClear={handleConversationClear}
+      onConversationExport={handleConversationExport}
+      onConversationFlatten={handleConversationFlatten}
+    />,
     [areChatsEmpty, focusedConversationId, handleConversationBranch, isFocusedChatEmpty, isMessageSelectionMode],
   );
 
@@ -456,7 +464,7 @@ export function AppChat() {
       conversationId={focusedConversationId}
       isDeveloperMode={focusedSystemPurposeId === 'MyContract'}
       isMaudMode={focusedSystemPurposeId === 'Maud'}
-      onAction={handleComposerAction} 
+      onAction={handleComposerAction}
       sx={{
         zIndex: 21, // position: 'sticky', bottom: 0,
         backgroundColor: 'background.surface',
