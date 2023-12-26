@@ -197,7 +197,7 @@ export function AppChat() {
 
       try {
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
-        const response = await axios.post('http://python-llm.ue.r.appspot/I ', { referenceNumber: userText });
+        const response = await axios.post('http://python-llm.ue.r.appspot/api/process', { referenceNumber: userText });
         console.log('API Response:', response.data);
 
       } catch (error) {
