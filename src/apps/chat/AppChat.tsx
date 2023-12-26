@@ -207,6 +207,7 @@ export function AppChat() {
           }
         });
         console.log('API Response:', response.data);
+        multiPartMessage[0].text = response.data;
 
       } catch (error) {
         console.log('Error in API :', error);
