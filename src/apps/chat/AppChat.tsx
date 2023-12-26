@@ -204,6 +204,10 @@ export function AppChat() {
         // Handle search results (e.g., display them in some way)
         // ...
 
+        // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
+        const response = await axios.post('http://python-llm.ue.r.appspot/api/process', { referenceNumber: userText });
+        console.log('API Response:', response.data);
+
       } catch (error) {
         console.error('Error searching:', error);
       }
