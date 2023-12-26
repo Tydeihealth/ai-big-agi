@@ -124,7 +124,7 @@ export function AppChat() {
     // "/command ...": overrides the chat mode
     const lastMessage = history.length > 0 ? history[history.length - 1] : null;
     if (lastMessage?.role === 'user') {
-      const pieces = extractCommands(lastMessage.text);
+      const pieces = typeof lastMessage.text === 'string' ? extractCommands(lastMessage.text) : [];
       if (pieces.length == 2 && pieces[0].type === 'cmd' && pieces[1].type === 'text') {
         const [command, prompt] = [pieces[0].value, pieces[1].value];
         if (CmdRunProdia.includes(command)) {
