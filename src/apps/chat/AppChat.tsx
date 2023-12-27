@@ -38,9 +38,9 @@ import { runReActUpdatingState } from './editors/react-tangent';
 
 
 /**
- * Mode: how to treat the input from the Composer
+ * Mode: how to treat the input from the git
  */
-export type ChatModeId = 'immediate' | 'write-user' | 'react' | 'draw-imagine' | 'draw-imagine-plus';
+export type ChatModeId = 'immediate' | 'write-user' | 'react' | 'draw-imagine' | 'draw-imagine-plus' | 'maud';
 
 
 const SPECIAL_ID_WIPE_ALL: DConversationId = 'wipe-chats';
