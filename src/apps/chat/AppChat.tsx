@@ -38,7 +38,7 @@ import { runReActUpdatingState } from './editors/react-tangent';
 
 
 /**
- * Mode: how to treat the input from the git
+ * Mode: how to treat the input from the gitgit st
  */
 export type ChatModeId = 'immediate' | 'write-user' | 'react' | 'draw-imagine' | 'draw-imagine-plus' | 'maud';
 
