@@ -115,7 +115,7 @@ export function makeAvatar(messageAvatar: string | null, messageRole: DMessage['
 }
 
 function explainErrorInMessage(text: string, isAssistant: boolean, modelId?: string) {
-  const isAssistantError = isAssistant && (text.startsWith('[Issue] ') || text.startsWith('[OpenAI Issue]'));
+  const isAssistantError = isAssistant && (String(text).startsWith('[Issue] ') || String(text).startsWith('[OpenAI Issue]'));
   let errorMessage: React.JSX.Element | null = null;
   if (!isAssistantError)
     return { errorMessage, isAssistantError };

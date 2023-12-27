@@ -209,15 +209,62 @@ export function AppChat() {
           }
         });
         console.log('API Response:', response.data);
-        apiResponse = JSON.stringify(response.data);
+        apiResponse = response.data;
 
       } catch (error) {
         console.log('Error in API :', error);
         apiResponse = String("Error occurred");
       }
+
       // Now create a message from the apiResponse and add it to the conversation
       if (apiResponse) {
-        const responseMessage = createDMessage('assistant', apiResponse);
+        // Extracting Summary and Details
+        const summary = apiResponse.Summary;
+        const details = apiResponse.Details;
+
+        // Formatting the Summary for better readability
+        let formattedSummary = 'Summary not available.';
+        if (summary) {
+          formattedSummary = `Summary:\n${summary.replace(/\. /g, '.\n')}`;
+        }
+
+        // Function to format object details recursively
+        const formatDetails = (obj: any, indentLevel = 0): string => {
+          if (!obj || typeof obj !== 'object') {
+            return ''; // Return empty string if obj is not a valid object
+          }
+
+          return Object.entries(obj).map(([key, value]) => {
+            if (key === 'metadata') return ''; // Skipping metadata
+
+            const indent = ' '.repeat(indentLevel * 2);
+            if (Array.isArray(value)) {
+              // Handling array values
+              return `${indent}- ${key}:\n${value.map(v =>
+                `${indent}  - ${typeof v === 'object' ? `\n${formatDetails(v, indentLevel + 2)}` : v}`
+              ).join('\n')}`;
+            } else if (typeof value === 'object') {
+              // Handling nested objects
+              return `${indent}- ${key}:\n${formatDetails(value, indentLevel + 2)}`;
+            } else {
+              // Handling primitive values
+              return `${indent}- ${key}: ${value}`;
+            }
+          }).filter(line => line).join('\n'); // Filter out empty lines (like from metadata)
+        };
+
+        // Formatting the Details
+        let formattedDetails = `Details:\n`;
+        if (details && typeof details === 'object') {
+          formattedDetails += formatDetails(details);
+        } else if (details) {
+          formattedDetails += details;
+        } else {
+          formattedDetails += 'Details not available.';
+        }
+
+        // Creating the response message
+        const responseMessage = createDMessage('assistant', `${formattedSummary}\n\n${formattedDetails}`);
         const conversation = getConversation(conversationId);
         if (conversation) {
           setMessages(conversationId, [...conversation.messages, responseMessage]);
