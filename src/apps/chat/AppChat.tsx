@@ -487,9 +487,9 @@ export function AppChat() {
             setIsMessageSelectionMode={setIsMessageSelectionMode}
             onConversationBranch={handleConversationBranch}
             onConversationExecuteHistory={handleConversationExecuteHistory}
-            // onTextDiagram={handleTextDiagram}
-            // onTextImagine={handleTextImaginePlus}
-            // onTextSpeak={handleTextSpeak}
+            onTextDiagram={handleTextDiagram}
+            onTextImagine={handleTextImaginePlus}
+            onTextSpeak={handleTextSpeak}
             sx={{
               flexGrow: 1,
               backgroundColor: 'background.level1',
