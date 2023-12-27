@@ -183,7 +183,7 @@ export function AppChat() {
     setMessages(conversationId, history);
   }, [focusedSystemPurposeId, setMessages]);
 
-  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode:boolean) => {
+  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => {
 
     let userText;
     let apiResponse;
@@ -201,8 +201,9 @@ export function AppChat() {
 
       try {
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
+        // SSL API Post call to https://api.llm.tydeihealth.com/api/process
 
-        const response = await axios.post('http://python-llm.ue.r.appspot.com/api/process',
+        const response = await axios.post('https://api.llm.tydeihealth.com/api/process',
           { "referenceNumber": userText }, {
           headers: {
             'Content-Type': 'application/json'
@@ -228,30 +229,42 @@ export function AppChat() {
           formattedSummary = `Summary:\n${summary.replace(/\. /g, '.\n')}`;
         }
 
-        // Function to format object details recursively
-        const formatDetails = (obj: any, indentLevel = 0): string => {
+        // Function to format object detaigirls recursively
+        const formatDetails = (obj:any, indentLevel = 0):string => {
           if (!obj || typeof obj !== 'object') {
             return ''; // Return empty string if obj is not a valid object
           }
 
+          const indent = ' '.repeat(indentLevel * 2);
+          const bullet = `${indent}- `;
           return Object.entries(obj).map(([key, value]) => {
             if (key === 'metadata') return ''; // Skipping metadata
 
-            const indent = ' '.repeat(indentLevel * 2);
             if (Array.isArray(value)) {
-              // Handling array values
-              return `${indent}- ${key}:\n${value.map(v =>
-                `${indent}  - ${typeof v === 'object' ? `\n${formatDetails(v, indentLevel + 2)}` : v}`
-              ).join('\n')}`;
+              // Handling array values, each item gets its own set of sub-bullets
+              const arrayItems = value.map(v => {
+                if (typeof v === 'object') {
+                  // If array item is an object, format its properties as sub-bullets
+                  return `\n${formatDetails(v, indentLevel + 1)}`;
+                } else {
+                  // If array item is a primitive, simply return its value
+                  return `${bullet}${v}`;
+                }
+              }).join('\n');
+              return `${bullet}${key}:[${arrayItems}\n${indent}]`;
             } else if (typeof value === 'object') {
-              // Handling nested objects
-              return `${indent}- ${key}:\n${formatDetails(value, indentLevel + 2)}`;
+              // Handling nested objects, format its properties as sub-bullets
+              return `${bullet}${key}:\n${formatDetails(value, indentLevel + 1)}`;
             } else {
               // Handling primitive values
-              return `${indent}- ${key}: ${value}`;
+              return `${bullet}${key}: ${value}`;
             }
           }).filter(line => line).join('\n'); // Filter out empty lines (like from metadata)
         };
+
+        // Then use formatDetails as before in your code to format the 'details' object
+
+
 
         // Formatting the Details
         let formattedDetails = `Details:\n`;
