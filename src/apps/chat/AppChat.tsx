@@ -36,7 +36,7 @@ import { runBrowseUpdatingState } from './editors/browse-load';
 import { runImageGenerationUpdatingState } from './editors/image-generate';
 import { runReActUpdatingState } from './editors/react-tangent';
 
-import axios from 'axios'; // Assuming axios for HTTP requests
+
 /**
  * Mode: how to treat the input from the Composer
  */
@@ -185,6 +185,9 @@ export function AppChat() {
 
   const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => {
 
+    let userText;
+    let apiResponse;
+
     console.log('MaudMode ', isMaudMode);
     if (isMaudMode) {
       if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
@@ -192,33 +195,43 @@ export function AppChat() {
         return false;
       }
 
-      const userText = multiPartMessage[0].text;
+      userText = multiPartMessage[0].text;
       console.log('User Text:', userText);
       const axios = require('axios');
 
-
       try {
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
-        
+
         const response = await axios.post('http://python-llm.ue.r.appspot.com/api/process',
-          {"referenceNumber": userText}, {
+          { "referenceNumber": userText }, {
           headers: {
             'Content-Type': 'application/json'
           }
         });
         console.log('API Response:', response.data);
-      
+        apiResponse = JSON.stringify(response.data);
 
       } catch (error) {
         console.log('Error in API :', error);
+        apiResponse = String("Error occurred");
       }
+      // Now create a message from the apiResponse and add it to the conversation
+      if (apiResponse) {
+        const responseMessage = createDMessage('assistant', apiResponse);
+        const conversation = getConversation(conversationId);
+        if (conversation) {
+          setMessages(conversationId, [...conversation.messages, responseMessage]);
+        }
+      }
+
+
     }
 
     // validate inputs
     if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
       addSnackbar({
         key: 'chat-composer-action-invalid',
-        message: response.data,
+        message: apiResponse || '',
         type: 'issue',
         overrides: {
           autoHideDuration: 2000,
@@ -226,9 +239,9 @@ export function AppChat() {
       });
       return false;
     }
-    /* const userText = multiPartMessage[0].text;
+    userText = multiPartMessage[0].text;
     console.log('userText  from Chatbox', userText);   // this is the text from the ChatBox Input */
-
+    console.log('apiresponse : ', apiResponse); // this is the apiresponse */
 
 
     // find conversation
@@ -236,11 +249,12 @@ export function AppChat() {
     if (!conversation)
       return false;
 
-    // start execution (async)
-    void _handleExecute(chatModeId, conversationId, [
-      ...conversation.messages,
-      createDMessage('user', userText)
-    ]);
+    /*   // start execution (async)
+      void _handleExecute(chatModeId, conversationId, [
+        ...conversation.messages,
+        createDMessage('user', userText)
+      ]); 
+   */
 
     return true;
   };
@@ -261,14 +275,14 @@ export function AppChat() {
 
   const handleTextDiagram = async (diagramConfig: DiagramConfig | null) => setDiagramConfig(diagramConfig);
 
-/*   const handleTextImaginePlus = async (conversationId: DConversationId, messageText: string) => {
+  const handleTextImaginePlus = async (conversationId: DConversationId, messageText: string) => {
     const conversation = getConversation(conversationId);
     if (conversation)
       return await _handleExecute('draw-imagine-plus', conversationId, [
         ...conversation.messages,
         createDMessage('user', messageText),
       ]);
-  }; */
+  };
 
   const handleTextSpeak = async (text: string) => {
     await speakText(text);

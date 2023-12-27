@@ -253,7 +253,7 @@ export function ChatMessage(props: {
 
   const showAvatars = props.hideAvatars !== true && !cleanerLooks;
 
-  const textSel = selMenuText ? selMenuText : messageText;
+  const textSel = String(selMenuText ? selMenuText : messageText);
   const isSpecialProdia = textSel.startsWith('https://images.prodia.xyz/') || textSel.startsWith('/imagine') || textSel.startsWith('/img');
   const couldDiagram = textSel?.length >= 100 && !isSpecialProdia;
   const couldImagine = textSel?.length >= 2 && !isSpecialProdia;
@@ -420,7 +420,7 @@ export function ChatMessage(props: {
   let collapsedText = messageText;
   let isCollapsed = false;
   if (fromUser && !forceUserExpanded) {
-    const lines = messageText.split('\n');
+    const lines = String(messageText).split('\n');
     if (lines.length > USER_COLLAPSED_LINES) {
       collapsedText = lines.slice(0, USER_COLLAPSED_LINES).join('\n');
       isCollapsed = true;
