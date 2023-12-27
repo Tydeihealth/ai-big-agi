@@ -73,7 +73,7 @@ export function Composer(props: {
   conversationId: DConversationId | null;
   isDeveloperMode: boolean;
   isMaudMode: boolean;
-  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => boolean;
+  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => Promise<boolean>;
   sx?: SxProps;
 }) {
 

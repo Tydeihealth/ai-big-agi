@@ -183,7 +183,7 @@ export function AppChat() {
     setMessages(conversationId, history);
   }, [focusedSystemPurposeId, setMessages]);
 
-  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => {
+  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode:boolean) => {
 
     let userText;
     let apiResponse;
