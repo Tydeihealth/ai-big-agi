@@ -124,7 +124,7 @@ export function AppChat() {
     // "/command ...": overrides the chat mode
     const lastMessage = history.length > 0 ? history[history.length - 1] : null;
     if (lastMessage?.role === 'user') {
-      const pieces = typeof lastMessage.text === 'string' ? extractCommands(lastMessage.text) : [];
+      const pieces = extractCommands(lastMessage.text);
       if (pieces.length == 2 && pieces[0].type === 'cmd' && pieces[1].type === 'text') {
         const [command, prompt] = [pieces[0].value, pieces[1].value];
         if (CmdRunProdia.includes(command)) {
@@ -207,7 +207,7 @@ export function AppChat() {
           }
         });
         console.log('API Response:', response.data);
-        multiPartMessage[0].text = response.data;
+      
 
       } catch (error) {
         console.log('Error in API :', error);
@@ -218,7 +218,7 @@ export function AppChat() {
     if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
       addSnackbar({
         key: 'chat-composer-action-invalid',
-        message: 'Only a single text part is supported for now.',
+        message: response.data,
         type: 'issue',
         overrides: {
           autoHideDuration: 2000,
@@ -226,8 +226,8 @@ export function AppChat() {
       });
       return false;
     }
-    const userText = multiPartMessage[0].text;
-    console.log('userText  from Chatbox', userText);   // this is the text from the ChatBox Input
+    /* const userText = multiPartMessage[0].text;
+    console.log('userText  from Chatbox', userText);   // this is the text from the ChatBox Input */
 
 
 
@@ -261,14 +261,14 @@ export function AppChat() {
 
   const handleTextDiagram = async (diagramConfig: DiagramConfig | null) => setDiagramConfig(diagramConfig);
 
-  const handleTextImaginePlus = async (conversationId: DConversationId, messageText: string) => {
+/*   const handleTextImaginePlus = async (conversationId: DConversationId, messageText: string) => {
     const conversation = getConversation(conversationId);
     if (conversation)
       return await _handleExecute('draw-imagine-plus', conversationId, [
         ...conversation.messages,
         createDMessage('user', messageText),
       ]);
-  };
+  }; */
 
   const handleTextSpeak = async (text: string) => {
     await speakText(text);
@@ -426,9 +426,9 @@ export function AppChat() {
             setIsMessageSelectionMode={setIsMessageSelectionMode}
             onConversationBranch={handleConversationBranch}
             onConversationExecuteHistory={handleConversationExecuteHistory}
-            onTextDiagram={handleTextDiagram}
-            onTextImagine={handleTextImaginePlus}
-            onTextSpeak={handleTextSpeak}
+            // onTextDiagram={handleTextDiagram}
+            // onTextImagine={handleTextImaginePlus}
+            // onTextSpeak={handleTextSpeak}
             sx={{
               flexGrow: 1,
               backgroundColor: 'background.level1',
