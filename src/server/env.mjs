@@ -21,6 +21,9 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: z.string().optional(),
     ANTHROPIC_API_HOST: z.string().url().optional(),
 
+    // LLM: Mistral
+    MISTRAL_API_KEY: z.string().optional(),
+
     // LLM: Ollama
     OLLAMA_API_HOST: z.string().url().optional(),
 
@@ -58,6 +61,9 @@ export const env = createEnv({
     console.error('❌ Invalid environment variables:', error.issues);
     throw new Error('Invalid environment variable');
   },
+
+  // matches user expectations - see https://github.com/enricoros/big-AGI/issues/279
+  emptyStringAsUndefined: true,
 
   // with Noext.JS >= 13.4.4 we'd only need to destructure client variables
   experimental__runtimeEnv: {},

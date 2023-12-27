@@ -38,9 +38,9 @@ import { runReActUpdatingState } from './editors/react-tangent';
 
 
 /**
- * Mode: how to treat the input from the Composer
+ * Mode: how to treat the input from the gitgit st
  */
-export type ChatModeId = 'immediate' | 'write-user' | 'react' | 'draw-imagine' | 'draw-imagine-plus';
+export type ChatModeId = 'immediate' | 'write-user' | 'react' | 'draw-imagine' | 'draw-imagine-plus' | 'maud';
 
 
 const SPECIAL_ID_WIPE_ALL: DConversationId = 'wipe-chats';
@@ -183,13 +183,102 @@ export function AppChat() {
     setMessages(conversationId, history);
   }, [focusedSystemPurposeId, setMessages]);
 
-  const handleComposerAction = (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart): boolean => {
+  const handleComposerAction = async (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode:boolean) => {
+
+    let userText;
+    let apiResponse;
+
+    console.log('MaudMode ', isMaudMode);
+    if (isMaudMode) {
+      if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
+        console.error('Invalid message format');
+        return false;
+      }
+
+      userText = multiPartMessage[0].text;
+      console.log('User Text:', userText);
+      const axios = require('axios');
+
+      try {
+        // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
+
+        const response = await axios.post('http://python-llm.ue.r.appspot.com/api/process',
+          { "referenceNumber": userText }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('API Response:', response.data);
+        apiResponse = response.data;
+
+      } catch (error) {
+        console.log('Error in API :', error);
+        apiResponse = String("Error occurred");
+      }
+
+      // Now create a message from the apiResponse and add it to the conversation
+      if (apiResponse) {
+        // Extracting Summary and Details
+        const summary = apiResponse.Summary;
+        const details = apiResponse.Details;
+
+        // Formatting the Summary for better readability
+        let formattedSummary = 'Summary not available.';
+        if (summary) {
+          formattedSummary = `Summary:\n${summary.replace(/\. /g, '.\n')}`;
+        }
+
+        // Function to format object details recursively
+        const formatDetails = (obj: any, indentLevel = 0): string => {
+          if (!obj || typeof obj !== 'object') {
+            return ''; // Return empty string if obj is not a valid object
+          }
+
+          return Object.entries(obj).map(([key, value]) => {
+            if (key === 'metadata') return ''; // Skipping metadata
+
+            const indent = ' '.repeat(indentLevel * 2);
+            if (Array.isArray(value)) {
+              // Handling array values
+              return `${indent}- ${key}:\n${value.map(v =>
+                `${indent}  - ${typeof v === 'object' ? `\n${formatDetails(v, indentLevel + 2)}` : v}`
+              ).join('\n')}`;
+            } else if (typeof value === 'object') {
+              // Handling nested objects
+              return `${indent}- ${key}:\n${formatDetails(value, indentLevel + 2)}`;
+            } else {
+              // Handling primitive values
+              return `${indent}- ${key}: ${value}`;
+            }
+          }).filter(line => line).join('\n'); // Filter out empty lines (like from metadata)
+        };
+
+        // Formatting the Details
+        let formattedDetails = `Details:\n`;
+        if (details && typeof details === 'object') {
+          formattedDetails += formatDetails(details);
+        } else if (details) {
+          formattedDetails += details;
+        } else {
+          formattedDetails += 'Details not available.';
+        }
+
+        // Creating the response message
+        const responseMessage = createDMessage('assistant', `${formattedSummary}\n\n${formattedDetails}`);
+        const conversation = getConversation(conversationId);
+        if (conversation) {
+          setMessages(conversationId, [...conversation.messages, responseMessage]);
+        }
+      }
+
+
+    }
 
     // validate inputs
     if (multiPartMessage.length !== 1 || multiPartMessage[0].type !== 'text-block') {
       addSnackbar({
         key: 'chat-composer-action-invalid',
-        message: 'Only a single text part is supported for now.',
+        message: apiResponse || '',
         type: 'issue',
         overrides: {
           autoHideDuration: 2000,
@@ -197,18 +286,23 @@ export function AppChat() {
       });
       return false;
     }
-    const userText = multiPartMessage[0].text;
+    userText = multiPartMessage[0].text;
+    console.log('userText  from Chatbox', userText);   // this is the text from the ChatBox Input */
+    console.log('apiresponse : ', apiResponse); // this is the apiresponse */
+
 
     // find conversation
     const conversation = getConversation(conversationId);
     if (!conversation)
       return false;
 
-    // start execution (async)
-    void _handleExecute(chatModeId, conversationId, [
-      ...conversation.messages,
-      createDMessage('user', userText),
-    ]);
+    /*   // start execution (async)
+      void _handleExecute(chatModeId, conversationId, [
+        ...conversation.messages,
+        createDMessage('user', userText)
+      ]); 
+   */
+
     return true;
   };
 
@@ -251,6 +345,7 @@ export function AppChat() {
       : prependNewConversation(focusedSystemPurposeId ?? undefined),
     );
     composerTextAreaRef.current?.focus();
+    console.log('New Text Chat created');  // this is added when starting a new chat
   }, [focusedSystemPurposeId, newConversationId, prependNewConversation, setFocusedConversationId]);
 
   const handleConversationImportDialog = () => setTradeConfig({ dir: 'import' });
@@ -336,35 +431,35 @@ export function AppChat() {
   // Pluggable ApplicationBar components
 
   const centerItems = React.useMemo(() =>
-      <ChatDropdowns conversationId={focusedConversationId} />,
+    <ChatDropdowns conversationId={focusedConversationId} />,
     [focusedConversationId],
   );
 
   const drawerItems = React.useMemo(() =>
-      <ChatDrawerItemsMemo
-        activeConversationId={focusedConversationId}
-        disableNewButton={isFocusedChatEmpty}
-        onConversationActivate={setFocusedConversationId}
-        onConversationDelete={handleConversationDelete}
-        onConversationImportDialog={handleConversationImportDialog}
-        onConversationNew={handleConversationNew}
-        onConversationsDeleteAll={handleConversationsDeleteAll}
-      />,
+    <ChatDrawerItemsMemo
+      activeConversationId={focusedConversationId}
+      disableNewButton={isFocusedChatEmpty}
+      onConversationActivate={setFocusedConversationId}
+      onConversationDelete={handleConversationDelete}
+      onConversationImportDialog={handleConversationImportDialog}
+      onConversationNew={handleConversationNew}
+      onConversationsDeleteAll={handleConversationsDeleteAll}
+    />,
     [focusedConversationId, handleConversationDelete, handleConversationNew, isFocusedChatEmpty, setFocusedConversationId],
   );
 
   const menuItems = React.useMemo(() =>
-      <ChatMenuItems
-        conversationId={focusedConversationId}
-        hasConversations={!areChatsEmpty}
-        isConversationEmpty={isFocusedChatEmpty}
-        isMessageSelectionMode={isMessageSelectionMode}
-        setIsMessageSelectionMode={setIsMessageSelectionMode}
-        onConversationBranch={handleConversationBranch}
-        onConversationClear={handleConversationClear}
-        onConversationExport={handleConversationExport}
-        onConversationFlatten={handleConversationFlatten}
-      />,
+    <ChatMenuItems
+      conversationId={focusedConversationId}
+      hasConversations={!areChatsEmpty}
+      isConversationEmpty={isFocusedChatEmpty}
+      isMessageSelectionMode={isMessageSelectionMode}
+      setIsMessageSelectionMode={setIsMessageSelectionMode}
+      onConversationBranch={handleConversationBranch}
+      onConversationClear={handleConversationClear}
+      onConversationExport={handleConversationExport}
+      onConversationFlatten={handleConversationFlatten}
+    />,
     [areChatsEmpty, focusedConversationId, handleConversationBranch, isFocusedChatEmpty, isMessageSelectionMode],
   );
 
@@ -430,6 +525,7 @@ export function AppChat() {
       composerTextAreaRef={composerTextAreaRef}
       conversationId={focusedConversationId}
       isDeveloperMode={focusedSystemPurposeId === 'MyContract'}
+      isMaudMode={focusedSystemPurposeId === 'Maud'}
       onAction={handleComposerAction}
       sx={{
         zIndex: 21, // position: 'sticky', bottom: 0,

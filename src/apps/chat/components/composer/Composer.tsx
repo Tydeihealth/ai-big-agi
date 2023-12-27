@@ -72,7 +72,8 @@ export function Composer(props: {
   composerTextAreaRef: React.RefObject<HTMLTextAreaElement>;
   conversationId: DConversationId | null;
   isDeveloperMode: boolean;
-  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart) => boolean;
+  isMaudMode: boolean;
+  onAction: (chatModeId: ChatModeId, conversationId: DConversationId, multiPartMessage: ComposerOutputMultiPart, isMaudMode: boolean) => Promise<boolean>,
   sx?: SxProps;
 }) {
 
@@ -143,7 +144,7 @@ export function Composer(props: {
 
   const { conversationId, onAction } = props;
 
-  const handleSendAction = React.useCallback((_chatModeId: ChatModeId, composerText: string): boolean => {
+  const handleSendAction = React.useCallback(async (_chatModeId: ChatModeId, composerText: string): Promise<boolean> => {
     if (!conversationId)
       return false;
 
@@ -153,7 +154,7 @@ export function Composer(props: {
       return false;
 
     // send the message
-    const enqueued = onAction(_chatModeId, conversationId, multiPartMessage);
+    const enqueued = await onAction(_chatModeId, conversationId, multiPartMessage, props.isMaudMode);
     if (enqueued) {
       clearAttachments();
       setComposeText('');
@@ -162,19 +163,19 @@ export function Composer(props: {
     return enqueued;
   }, [clearAttachments, conversationId, llmAttachments, onAction, setComposeText]);
 
-  const handleTextareaKeyDown = React.useCallback((e: React.KeyboardEvent) => {
+  const handleTextareaKeyDown = React.useCallback(async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
 
       // Alt: append the message instead
       if (e.altKey) {
-        handleSendAction('write-user', composeText);
+        await handleSendAction('write-user', composeText);
         return e.preventDefault();
       }
 
       // Shift: toggles the 'enter is newline'
       if (enterIsNewline ? e.shiftKey : !e.shiftKey) {
         if (!assistantTyping)
-          handleSendAction(chatModeId, composeText);
+          await handleSendAction(chatModeId, composeText);
         return e.preventDefault();
       }
     }
@@ -364,10 +365,14 @@ export function Composer(props: {
       : isDraw
         ? 'Describe an idea or a drawing...'
         : isReAct
-          ? 'Multi-step reasoning question...'
-          : props.isDeveloperMode
-            ? 'Chat with me · drop source files · attach code...'
-            : /*isProdiaConfigured ?*/ 'Chat · /react · /imagine · drop text files...' /*: 'Chat · /react · drop text files...'*/;
+            ? 'Multi-step reasoning question...'
+            : props.isDeveloperMode
+                  ? 'Check all the contract data...'
+  //                : /*isProdiaConfigured ?*/ 'Chat / Drop text files...' /*: 'Chat · /react · drop text files...'*/;
+                  : props.isMaudMode
+                     ? 'Check the Maud Database...'
+                     : 'Chat with me ...';
+
 
 
   return (
