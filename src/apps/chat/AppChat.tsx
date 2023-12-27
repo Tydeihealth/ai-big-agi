@@ -201,8 +201,9 @@ export function AppChat() {
 
       try {
         // Make an API POST call to http://python-llm.ue.r.appspot/api/process with the body {"referenceNumber":"<value>"}
+        // SSL API Post call to https://api.llm/tydeihealth.com/api/process
 
-        const response = await axios.post('http://python-llm.ue.r.appspot.com/api/process',
+        const response = await axios.post('https://api.llm/tydeihealth.com/api/process',
           { "referenceNumber": userText }, {
           headers: {
             'Content-Type': 'application/json'
